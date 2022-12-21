@@ -50,7 +50,7 @@ class GenerateUserSignature
 end
 
 
-class PrintForm
+class PrintSignature
   class << self
     def call(user_id:, address_id:)
       puts ''
@@ -64,23 +64,15 @@ class PrintForm
   end
 end
 
-# PrintForm.call(user_id: 99, address_id: 1)
+# PrintSignature.call(user_id: 99, address_id: 1)
 
-class PrintReport
+class ValidateSignature
   class << self
     def call(user_id:, address_id:)
       GenerateUserSignature.call(user_id: user_id, address_id: address_id)
         .either(
           -> user_signature {
-            puts ''
-            puts '########'
-            puts '<REPORT>'
-            puts user_signature
-            puts '</REPORT>'
-            puts '########'
-            puts ''
-
-            Success(:printed)
+            Success(:valid)
           },
           -> failure {
             Log.([
@@ -90,21 +82,21 @@ class PrintReport
               "failure: #{failure})"
             ].join)
 
-            Failure(:not_printed)
+            Failure(:not_valid)
           }
         )
     end
   end
 end
 
-# PrintReport.call(user_id: 99, address_id: 1)
+# ValidateSignature.call(user_id: 99, address_id: 1)
 
-class PrintParternsReport
+class PrintFamilySignature
   extend Dry::Monads[:do, :result]
 
   class << self
     def call(user_ids:, address_id:)
-      print_it(user_ids: user_ids, address_id: address_id)
+      print(user_ids: user_ids, address_id: address_id)
         .or { |failure|
           Log.([
             "NoPrintForParternsReport(",
@@ -117,16 +109,16 @@ class PrintParternsReport
         }
     end
 
-    def print_it(user_ids:, address_id:)
+    def print(user_ids:, address_id:)
       users_signatures = user_ids.map { |user_id|
         yield GenerateUserSignature.call(user_id: user_id, address_id: address_id)
       }
 
       puts ''
       puts '########'
-      puts '<REPORT>'
+      puts '<Family>'
       puts users_signatures
-      puts '</REPORT>'
+      puts '</Family>'
       puts '########'
       puts ''
 
@@ -135,4 +127,4 @@ class PrintParternsReport
   end
 end
 
-# PrintParternsReport.call(user_ids: [1, :a], address_id: 1)
+# PrintFamilySignature.call(user_ids: [1, :a], address_id: 1)

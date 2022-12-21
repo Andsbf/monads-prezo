@@ -50,7 +50,7 @@ class GenerateUserSignature
   end
 end
 
-class PrintForm
+class PrintSignature
   class << self
     def call(user_id:, address_id:)
       user_signature = begin
@@ -70,21 +70,15 @@ class PrintForm
   end
 end
 
-# PrintForm.call(user_id: 99, address_id: 1)
+# PrintSignature.call(user_id: 99, address_id: 1)
 
-class PrintReport
+class ValidateSignature
   class << self
     def call(user_id:, address_id:)
       user_signature = GenerateUserSignature.call(user_id: user_id, address_id: address_id)
 
       if user_signature
-        puts ''
-        puts '########'
-        puts '<FORM>'
-        puts user_signature
-        puts '</FORM>'
-        puts '########'
-        puts ''
+        puts 'valid!'
       else
         Log.([
           "NoPrintForReport(",
@@ -105,9 +99,9 @@ class PrintReport
   end
 end
 
-# PrintReport.call(user_id: 1, address_id: 99)
+# ValidateSignature.call(user_id: 1, address_id: 99)
 
-class PrintParternsReport
+class PrintFamilySignature
   class << self
     def call(user_ids:, address_id:)
       users_signatures = user_ids.map { |user_id|
@@ -117,9 +111,9 @@ class PrintParternsReport
       if users_signatures.all? { |signature| signature != nil }
         puts ''
         puts '########'
-        puts '<FORM>'
+        puts '<Family>'
         puts users_signatures
-        puts '</FORM>'
+        puts '</Family>'
         puts '########'
         puts ''
       else
@@ -142,4 +136,4 @@ class PrintParternsReport
   end
 end
 
-# PrintParternsReport.call(user_ids: [1,:a], address_id: 1)
+# PrintFamilySignature.call(user_ids: [1,:a], address_id: 1)
