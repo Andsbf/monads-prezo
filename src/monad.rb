@@ -66,7 +66,7 @@ ShowHelp.call GenerateUserSignature.call(user_id: 99, address_id: 1)
 ShowHelp.call ""
 ShowHelp.call "## when DB errors -> GenerateUserSignature.call(user_ids: 1, address_id: :db_will_fail)"
 ShowHelp.call ""
-ShowHelp.call GenerateUserSignature.call(user_id: 1, address_id: 3)
+ShowHelp.call GenerateUserSignature.call(user_id: 1, address_id: :db_will_fail)
 
 # Another function
 class PrintSignature
@@ -100,7 +100,7 @@ ShowHelp.call PrintSignature.call(user_id: 99, address_id: 1)
 ShowHelp.call ""
 ShowHelp.call "## when DB errors -> PrintSignature.call(user_ids: 1, address_id: :db_will_fail)"
 ShowHelp.call ""
-ShowHelp.call PrintSignature.call(user_id: 1, address_id: 3)
+ShowHelp.call PrintSignature.call(user_id: 1, address_id: :db_will_fail)
 
 class ValidateSignature
   extend Dry::Monads[:result]
@@ -142,7 +142,7 @@ ShowHelp.call ValidateSignature.call(user_id: 99, address_id: 1)
 ShowHelp.call ""
 ShowHelp.call "## when DB errors -> ValidateSignature.call(user_ids: 1, address_id: :db_will_fail)"
 ShowHelp.call ""
-ShowHelp.call ValidateSignature.call(user_id: 1, address_id: 3)
+ShowHelp.call ValidateSignature.call(user_id: 1, address_id: :db_will_fail)
 
 class PrintFamilySignature
   extend Dry::Monads[:do, :result]
@@ -183,14 +183,14 @@ ShowHelp.call "## With valid user_ids & address_id -> PrintFamilySignature.call(
 ShowHelp.call ""
 ShowHelp.call PrintFamilySignature.call(user_ids: [1,2], address_id: 3)
 ShowHelp.call ""
-ShowHelp.call "## With valid user_id & invalid address_id -> PrintFamilySignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call "## With valid user_id & invalid address_id -> PrintFamilySignature.call(user_ids: [1, 2], address_id: 99)"
 ShowHelp.call ""
 ShowHelp.call PrintFamilySignature.call(user_ids: [1,2], address_id: 99)
 ShowHelp.call ""
-ShowHelp.call "## With invalid user_id & valid address_id -> PrintFamilySignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call "## With invalid user_id & valid address_id -> PrintFamilySignature.call(user_ids: [99, 2], address_id: 99)"
 ShowHelp.call ""
 ShowHelp.call PrintFamilySignature.call(user_ids: [99,2], address_id: 3)
 ShowHelp.call ""
-ShowHelp.call "## when DB errors -> PrintFamilySignature.call(user_ids: 1, address_id: :db_will_fail)"
+ShowHelp.call "## when DB errors -> PrintFamilySignature.call(user_ids: [1, :db_will_fail], address_id: 3)"
 ShowHelp.call ""
 ShowHelp.call PrintFamilySignature.call(user_ids: [1,:db_will_fail], address_id: 3)
