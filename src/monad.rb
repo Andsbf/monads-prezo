@@ -1,6 +1,7 @@
 require 'dry/monads'
 require "ostruct"
 require_relative './utils/log'
+require_relative './utils/show_help'
 
 class User
   extend Dry::Monads[:result]
@@ -36,6 +37,7 @@ class Address
   end
 end
 
+# Our first function
 class GenerateUserSignature
   extend Dry::Monads[:do, :result]
 
@@ -49,34 +51,70 @@ class GenerateUserSignature
   end
 end
 
+ShowHelp.call "\n\n# GenerateUserSignature use cases:"
+ShowHelp.call "## With valid user_id & address_id -> GenerateUserSignature.call(user_id: 1, address_id: 1)\n"
+ShowHelp.call ""
+ShowHelp.call GenerateUserSignature.call(user_id: 1, address_id: 3)
+ShowHelp.call ""
+ShowHelp.call "## With valid user_id & invalid address_id -> GenerateUserSignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call ""
+ShowHelp.call GenerateUserSignature.call(user_id: 1, address_id: 99)
+ShowHelp.call ""
+ShowHelp.call "## With invalid user_id & valid address_id -> GenerateUserSignature.call(user_id: 99, address_id: 3)"
+ShowHelp.call ""
+ShowHelp.call GenerateUserSignature.call(user_id: 99, address_id: 1)
+ShowHelp.call ""
+ShowHelp.call "## when DB errors -> GenerateUserSignature.call(user_ids: 1, address_id: :db_will_fail)"
+ShowHelp.call ""
+ShowHelp.call GenerateUserSignature.call(user_id: 1, address_id: 3)
 
+# Another function
 class PrintSignature
+  extend Dry::Monads[:result]
+
   class << self
     def call(user_id:, address_id:)
       puts ''
-      puts '########'
-      puts '<FORM>'
+      puts '<Signature>'
       puts GenerateUserSignature.call(user_id: user_id, address_id: address_id).value_or('not_signed')
-      puts '</FORM>'
-      puts '########'
+      puts '</Signature>'
       puts ''
+
+      Success(:printed)
     end
   end
 end
 
-# PrintSignature.call(user_id: 99, address_id: 1)
+ShowHelp.call "\n\n# PrintSignature use cases:"
+ShowHelp.call "## With valid user_id & address_id -> PrintSignature.call(user_id: 1, address_id: 1)\n"
+ShowHelp.call ""
+ShowHelp.call PrintSignature.call(user_id: 1, address_id: 3)
+ShowHelp.call ""
+ShowHelp.call "## With valid user_id & invalid address_id -> PrintSignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call ""
+ShowHelp.call PrintSignature.call(user_id: 1, address_id: 99)
+ShowHelp.call ""
+ShowHelp.call "## With invalid user_id & valid address_id -> PrintSignature.call(user_id: 99, address_id: 3)"
+ShowHelp.call ""
+ShowHelp.call PrintSignature.call(user_id: 99, address_id: 1)
+ShowHelp.call ""
+ShowHelp.call "## when DB errors -> PrintSignature.call(user_ids: 1, address_id: :db_will_fail)"
+ShowHelp.call ""
+ShowHelp.call PrintSignature.call(user_id: 1, address_id: 3)
 
 class ValidateSignature
+  extend Dry::Monads[:result]
+
   class << self
     def call(user_id:, address_id:)
       GenerateUserSignature.call(user_id: user_id, address_id: address_id)
         .either(
-          -> user_signature {
+          -> _{
             Success(:valid)
           },
           -> failure {
             Log.([
-              "NoPrintForReport(",
+              "ValidationFail(",
               "user_id: #{user_id}, ",
               "address_id: #{address_id}, ",
               "failure: #{failure})"
@@ -89,7 +127,22 @@ class ValidateSignature
   end
 end
 
-# ValidateSignature.call(user_id: 99, address_id: 1)
+ShowHelp.call "\n\n# ValidateSignature use cases:"
+ShowHelp.call "## With valid user_id & address_id -> ValidateSignature.call(user_id: 1, address_id: 1)\n"
+ShowHelp.call ""
+ShowHelp.call ValidateSignature.call(user_id: 1, address_id: 3)
+ShowHelp.call ""
+ShowHelp.call "## With valid user_id & invalid address_id -> ValidateSignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call ""
+ShowHelp.call ValidateSignature.call(user_id: 1, address_id: 99)
+ShowHelp.call ""
+ShowHelp.call "## With invalid user_id & valid address_id -> ValidateSignature.call(user_id: 99, address_id: 3)"
+ShowHelp.call ""
+ShowHelp.call ValidateSignature.call(user_id: 99, address_id: 1)
+ShowHelp.call ""
+ShowHelp.call "## when DB errors -> ValidateSignature.call(user_ids: 1, address_id: :db_will_fail)"
+ShowHelp.call ""
+ShowHelp.call ValidateSignature.call(user_id: 1, address_id: 3)
 
 class PrintFamilySignature
   extend Dry::Monads[:do, :result]
@@ -99,7 +152,7 @@ class PrintFamilySignature
       print(user_ids: user_ids, address_id: address_id)
         .or { |failure|
           Log.([
-            "NoPrintForParternsReport(",
+            "PrintFamilySignatureFail(",
             "user_ids: #{user_ids}, ",
             "address_id: #{address_id}, ",
             "failure: #{failure}"
@@ -115,11 +168,9 @@ class PrintFamilySignature
       }
 
       puts ''
-      puts '########'
       puts '<Family>'
       puts users_signatures
       puts '</Family>'
-      puts '########'
       puts ''
 
       Success(:printed)
@@ -127,4 +178,19 @@ class PrintFamilySignature
   end
 end
 
-# PrintFamilySignature.call(user_ids: [1, :a], address_id: 1)
+ShowHelp.call "\n\n# PrintFamilySignature use cases:"
+ShowHelp.call "## With valid user_ids & address_id -> PrintFamilySignature.call(user_ids: [1,2], address_id: 1)\n"
+ShowHelp.call ""
+ShowHelp.call PrintFamilySignature.call(user_ids: [1,2], address_id: 3)
+ShowHelp.call ""
+ShowHelp.call "## With valid user_id & invalid address_id -> PrintFamilySignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call ""
+ShowHelp.call PrintFamilySignature.call(user_ids: [1,2], address_id: 99)
+ShowHelp.call ""
+ShowHelp.call "## With invalid user_id & valid address_id -> PrintFamilySignature.call(user_id: 1, address_id: 99)"
+ShowHelp.call ""
+ShowHelp.call PrintFamilySignature.call(user_ids: [99,2], address_id: 3)
+ShowHelp.call ""
+ShowHelp.call "## when DB errors -> PrintFamilySignature.call(user_ids: 1, address_id: :db_will_fail)"
+ShowHelp.call ""
+ShowHelp.call PrintFamilySignature.call(user_ids: [1,:db_will_fail], address_id: 3)

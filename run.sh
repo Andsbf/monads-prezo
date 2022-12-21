@@ -8,6 +8,8 @@ echo
 
 files=( ./src/*.rb )
 
+clear
+
 PS3='Select file to run, or 0 to exit: '
 select file in "${files[@]}"; do
     if [[ $REPLY == "0" ]]; then
